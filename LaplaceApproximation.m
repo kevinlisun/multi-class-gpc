@@ -109,12 +109,10 @@ if para.c > 2
             f = f_new;
             disp(['error at iter ', num2str(iter), ' is: ', num2str(error)]);
             if para.flag
-                figure(2);
-                title('GP multi-class classification');
-                subplot(2,2,1)
-                title('the latent variables');
+                scrsz = get(0,'ScreenSize');
+                fig2 = figure(2);
+                set(fig2, 'name', 'The Latent Variables of GP multi-class classification', 'Position',[575 scrsz(4) 500 400]);
                 imagesc(reshape(f,[n,c]));
-                
                 pause(.01)
             end
         end

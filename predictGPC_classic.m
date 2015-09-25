@@ -79,35 +79,35 @@ y = sum(cell2mat(Y),3);
 fm = sum(cell2mat(FM),3);
 prob = sum(cell2mat(PROB),3);
 
-if para.flag
-    figure(2)
-    ax1 = subplot(2,2,2);
-    title('the prediction labels');
-    [ ybin ] = label2binary(y, c);
-    ybin = reshape(ybin, size(prob));
-    
-    imagesc(ybin);
-    
-    ax2 = subplot(2,2,3);
-    title('the full prediction probalities');
-    imagesc(prob); 
-end
+% % if para.flag
+% %     figure(2)
+% %     ax1 = subplot(2,2,2);
+% %     title('the prediction labels');
+% %     [ ybin ] = label2binary(y, c);
+% %     ybin = reshape(ybin, size(prob));
+% %     
+% %     imagesc(ybin);
+% %     
+% %     ax2 = subplot(2,2,3);
+% %     title('the full prediction probalities');
+% %     imagesc(prob); 
+% % end
 %%
 
 % % entropy = sum(prob.*log(prob),2);
 max_prob = max(prob, [], 2);
 
-if para.flag
-    subplot(2,2,4)
-    title('the confidence of prediction');
-    color = [ 'r', 'b', 'k', 'g', 'y' ];
-    marker = [ '+', 'x', '*', 'o', '^' ];
-    for ci = 1:c
-        plot(find(y==ci), max_prob(y==ci), [color(ci),marker(ci)]);
-        hold on;
-    end
-    plot(1:length(y), 0.25 * ones(size(y)));
-    hold off;
-end
+% % if para.flag
+% %     subplot(2,2,4)
+% %     title('the confidence of prediction');
+% %     color = [ 'r', 'b', 'k', 'g', 'y' ];
+% %     marker = [ '+', 'x', '*', 'o', '^' ];
+% %     for ci = 1:c
+% %         plot(find(y==ci), max_prob(y==ci), [color(ci),marker(ci)]);
+% %         hold on;
+% %     end
+% %     plot(1:length(y), 0.25 * ones(size(y)));
+% %     hold off;
+% % end
 
 

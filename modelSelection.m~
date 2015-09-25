@@ -3,8 +3,7 @@ function [ hyp ] = modelSelection(para, X, y)
 scrsz = get(0,'ScreenSize');
 fig1 = figure(1);
 set(fig1, 'Position',[1 scrsz(4) 500 400]);
-
-subplot(1,3,1);
+figure(1);
 title('hyperparameters optimization for model selection');
 
 hyp = para.hyp;

@@ -28,7 +28,9 @@ save('classifier_gp_demo.mat','gp_model','gp_para');
 [ ypredict prob fm ] = predictGPC_classic(hyp, para, Xtrain, ytrain, gp_model, Xtest);
 
 if para.flag
-    figure('name','The confusion matrix');
+    scrsz = get(0,'ScreenSize');
+    fig3 = figure(3);
+    set(fig3, 'name', 'The confusion matrix', 'Position',[1000 scrsz(4) 500 400]);
     c = para.c;
     [ ytest ] = label2binary(ytest, c, 'mat');
     [ ypredict ] = label2binary(ypredict, c, 'mat');

@@ -18,19 +18,20 @@ function [ F f ] = objectivefunc(hyp)
     
     logML = [ logML, F ];
     
-    figure(1);
+    scrsz = get(0,'ScreenSize');
+    fig1 = figure(1);
+    set(fig1, 'Position',[1 scrsz(4) 500 400]);
     subplot(1,3,1);
     plot(1:length(hyp), exp(hyp), 'xb', 'MarkerSize', 12, 'LineWidth', 2);
     title('hyper-paramethers');
-
     
-    figure(1)
+    figure(1);
     subplot(1,3,2);
     hold on;
     if length(logML) > 1
-        plot(length(logML)-1:length(logML), -logML(end-1:end), marker, 'MarkerSize', 12, 'LineWidth', 2);
+        plot(length(logML)-1:length(logML), -logML(end-1:end), marker, 'MarkerSize', 8, 'LineWidth', 2);
     else
-        plot(1:length(logML), -logML, marker, 'MarkerSize', 12, 'LineWidth', 2);
+        plot(1:length(logML), -logML, marker, 'MarkerSize', 8, 'LineWidth', 2);
     end
     title('The Log Marignal Likelihood');
 
