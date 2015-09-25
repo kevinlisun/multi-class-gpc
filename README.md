@@ -12,7 +12,7 @@
 
 ### How do I get set up? ###
 
-1) As this toolbox supports all kernels provided by GPML, you need to add GPML's toolbox to the path. 
+1) As this toolbox supports all kernels provided by GPML, you need to add GPML's toolbox (http://www.gaussianprocess.org/gpml/code/matlab/doc/) to the path. 
 2) run demo.m
 
 ### Contribution guidelines ###
