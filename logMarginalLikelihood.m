@@ -131,7 +131,8 @@ if para.c > 2
         ft = reshape(f, [n,c]);
         likelihood = -(f'*invBlockDiag(K,c)*f)./2 + y'*f - sum(log(sum(exp(ft),2)),1);
         
-        logdet_B = -logdet(eye(size(K)) + sW*sW'.*K) ./ 2; % - logdetA(K, diag(W))/2;
+        %logdet_B = -logdet(eye(size(K)) + sW*sW'.*K) ./ 2; %
+        logdet_B = - logdetA(K, diag(W))/2;
         
         likelihood = likelihood + logdet_B;
     elseif nargin == 4

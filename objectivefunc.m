@@ -20,18 +20,19 @@ function [ F f ] = objectivefunc(hyp)
     
     figure(1);
     subplot(1,3,1);
+    plot(1:length(hyp), exp(hyp), 'xb', 'MarkerSize', 12, 'LineWidth', 2);
     title('hyper-paramethers');
-    plot(1:length(hyp), exp(hyp), 'xb');
+
     
     figure(1)
-    subplot(1,3,2); 
-    title('log marignal likelihood');
+    subplot(1,3,2);
     hold on;
     if length(logML) > 1
-        plot(length(logML)-1:length(logML), -logML(end-1:end), marker);
+        plot(length(logML)-1:length(logML), -logML(end-1:end), marker, 'MarkerSize', 12, 'LineWidth', 2);
     else
-        plot(1:length(logML), -logML, marker);
+        plot(1:length(logML), -logML, marker, 'MarkerSize', 12, 'LineWidth', 2);
     end
+    title('The Log Marignal Likelihood');
 
     
     % caculate gridient
@@ -39,8 +40,9 @@ function [ F f ] = objectivefunc(hyp)
         f = logMarginalLikelihood(hyp, para, model, []);
         figure(1);
         subplot(1,3,3);
-        title('gradient')
-        plot(1:length(f), f, 'r^');
+        axis([0 4 -100 100]);
+        plot(1:length(f), f, 'r^', 'MarkerSize', 12, 'LineWidth', 2);
+        title('Gradient');
         pause(0.01);
     end
     
