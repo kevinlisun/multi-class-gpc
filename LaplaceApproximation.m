@@ -1,5 +1,13 @@
 function [ model ] = LaplaceApproximation(hyp, para, K, X, Y)
 
+% Copyright (c) University of Glasgow in UK  - All Rights Reserved
+% Author: Li Sun (Kevin) <lisunsir@gmail.com>
+% Institute: University of Glasgow
+% Details: Laplace Approximation for Gaussian Process Posterior Estimation
+% Reference: 
+% 1. <Gaussian Process for Machine Learning> 
+% 2. <Recognising the Clothing Categories from Free-Configuration using Gaussian-Process-Based Interactive Perception>
+
 
 maxIter = 50;
 thres = 1e-8;

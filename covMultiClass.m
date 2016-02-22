@@ -1,5 +1,14 @@
 function [ K ] = covMultiClass(hyp, para, X1, X2, i)
 
+% Copyright (c) University of Glasgow in UK  - All Rights Reserved
+% Author: Li Sun (Kevin) <lisunsir@gmail.com>
+% Institute: University of Glasgow
+% Details: Kernel Computation for multiple class GP Clasification
+% Reference: 
+% 1. <Gaussian Process for Machine Learning> 
+% 2. <Recognising the Clothing Categories from Free-Configuration using Gaussian-Process-Based Interactive Perception>
+
+
 kernel = para.kernel;
 c = para.c;
 
@@ -16,16 +25,6 @@ else
     disp('ERROR: Too many input variables!');
 end
 
-
-% % if strcmp(kernel,'LINard')
-% %     if nargin == 4
-% %         Kci = feval(@covLINard, hyp, X1, X2);
-% %     elseif nargin == 5
-% %         Kci = feval(@covLINard, hyp, X1, X2, i);
-% %     else
-% %         disp('ERROR: Too many input variables!');
-% %     end       
-% % end
 
 if c == 2
     K = Kci;

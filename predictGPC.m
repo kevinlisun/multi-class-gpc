@@ -1,81 +1,95 @@
-function [ y prob ] = predictGPC(X, Y, model, x, para)
+function [ y prob fm ] = predictGPC(hyp, para, X, Y, model, x)
+
+% Copyright (c) University of Glasgow in UK  - All Rights Reserved
+% Author: Li Sun (Kevin) <lisunsir@gmail.com>
+% Institute: University of Glasgow
+% Details: Prediction for Multiple Class GP classification p(y*|X,Y,x*)
+% Reference: 
+% 1. <Gaussian Process for Machine Learning> 
+% 2. <Recognising the Clothing Categories from Free-Configuration using Gaussian-Process-Based Interactive Perception>
 
 
-K = model.cov.K;
-cov = model.cov;
+K = model.K;
+W = model.W;
 f = model.f;
 Pi = model.Pi;
+TT = model.TT;
 
-n = para.n;
-c = para.c; 
-% K = cov.K;
+n = length(Y);
+c = para.c;
+kernel = para.kernel;
+
 [ Ybin ] = label2binary(Y);
 
-Pi = zeros(n,c);
+Ncore = para.Ncore;
 
-
-ft = reshape(exp(f),[n,c]);
-Pi = ft ./ repmat(sum(ft,2),[1 c]);
-for ci = 1:c
-%     ft = f;
-%     ft = reshape(ft,[n,c]);
-%     ft = softmax(ft, para.softmax);
-%     pi = ft(:,ci) ./ sum(ft,2);
-%     Pi(:,ci) = pi;
-    dc = diag(Pi(:,ci));
-    Dc{ci} = dc;
-    
-    Kc = cov.Kc{ci};
-    
-    L = chol(eye(size(Kc)) + sqrt(dc)*Kc*sqrt(dc),'lower');
-    
-    
-    ec = sqrt(dc) * L' \ (L\sqrt(dc));
-    Ec{ci} = ec;
-
+for j = 1:Ncore
+    batch_list{j} = j:Ncore:size(x,1);
 end
 
-% compute Pi and TT with eq 3.34 and 3.38
-Pi = Pi(:);
-TT = stackVerticalMatrices(Dc);
+Y = cell(1,1,Ncore);
+FM = cell(1,1,Ncore);
+PROB = cell(1,1,Ncore);
 
-E = constructBlockDiag(Ec);
-M = chol(multiClassMatricesSum(Ec), 'lower');
-R = eye(n);
-
-prob = zeros(size(x,1), c);
-y = zeros(size(x,1), 1);
-
-for i = 1:size(x,1)
-    disp(['predicting the ', num2str(i),'th of ', num2str(size(x,1)), ' testing example ...']);
-    Mu = zeros(1, c);
-    Cov = zeros(c, c);
+for j = 1:Ncore
     
-    for ci = 1:c
-        index = repmat(1:c,[n,1]);
-        index = index(:);
-        % kc is the covariance matrix(vector) between x* (testing example) and
-        % X of classs ci
-        [ kc ] = computeCov(X, x(i,:), para);
-        Mu(ci) = (Ybin(index==ci) - Pi(index==ci))' * kc;
+    tmp_list = batch_list{j};
+    y = zeros(size(x,1), 1);
+    fm = zeros(size(x,1), c);
+    prob = zeros(size(x,1), c);
+    
+    for i = 1:length(batch_list{j})
         
-        B = Ec{ci} * kc;
-        C = Ec{ci} * (R * (M' \ (M\(R'*B))));
+        Mu = zeros(1,c);
+        Cov = zeros(c,c);
         
-        for cj = 1:c
-            Cov(ci,cj) = C' * kc;
+        disp(['predicting the ', num2str(tmp_list(i)),'th of ', num2str(size(x,1)), ' testing example ...']);
+        index = repmat(1:c, [n 1]);
+        
+        for ci = 1:c
+            xi = x(tmp_list(i),:);
+            kc = feval(kernel, hyp, X, xi);
+            %kc = computeCov(X, xi, para);
+            yc = Ybin(index == ci);
+            pic = Pi(index == ci);
+            
+            Mu(ci) = kc' * (yc - pic);
         end
-        [ kcxx ] = computeCov(x(i,:), x(i,:), para);
-        Cov(ci, ci) = Cov(ci, ci) + kcxx -B' * kc;
+        
+        Q = covMultiClass(hyp, para, X, xi);
+        
+        Cov = eye(c) * feval(kernel, hyp, xi, xi) - Q' * inv(K + inv(W+10e-8*eye(size(W)))) * Q;
+        %%-----------------fast------------------%%
+        % %     D = diag(Pi);
+        % %     R = inv(D) * TT;
+        % %     E = D^(0.5) * inv(eye(size(K)) + D^(0.5)*K*D^(0.5)) *  D^(0.5);
+        % %     KWinv_inv = E - E * R * inv(R'*E*R) * R' * E;
+        % %     Cov = eye(c) * computeCov(xi, xi, para) - Q' * KWinv_inv * Q;
+        %------------------------------------------
+        
+        % get the probility estimation from sampling
+        S = para.S;
+        fs = mgd(S, c, Mu, Cov);
+        fm(tmp_list(i),:) = Mu;
+        
+        fs = exp(fs);
+        p = fs ./ repmat(sum(fs,2),[1,c]);
+        p = sum(p,1) / S;
+        prob(tmp_list(i),:) = p;
+        
+        [ tmp y(tmp_list(i)) ] = max(p);
     end
-    S = 1e5;
-    fs = mgd(S, c, Mu, Cov);
-    fs = exp(fs);
-    fs = fs./repmat(sum(fs,2),[1 c]);
-%     fs = softmax(fs, para.softmax);
-    p = fs;
-    p = sum(p,1) / S;
-    prob(i,:) = p;
-    
-    [ tmp y(i) ] = max(p);
+    Y{j} = y;
+    FM{j} = fm;
+    PROB{j} = prob;
 end
+
+y = sum(cell2mat(Y),3);
+fm = sum(cell2mat(FM),3);
+prob = sum(cell2mat(PROB),3);
+
+%% predictive confidence (largest predictive probablity)
+max_prob = max(prob, [], 2);
+
+
+
